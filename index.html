@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הרפתקת הזאב</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        canvas {
+            display: block;
+            margin: auto;
+            background: #222;
+        }
+    </style>
+</head>
+<body>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+<script>
+    // Game setup
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Game objects
+    const player = { x: 50, y: 50, width: 50, height: 50, color: "blue", speed: 5 };
+    const enemy = { x: 300, y: 200, width: 50, height: 50, color: "red" };
+    const child = { x: 600, y: 400, width: 50, height: 50, color: "yellow" };
+
+    let keys = {};
+
+    // Handle keyboard input
+    window.addEventListener("keydown", (e) => {
+        keys[e.key] = true;
+    });
+    window.addEventListener("keyup", (e) => {
+        keys[e.key] = false;
+    });
+
+    // Update game state
+    function update() {
+        // Player movement
+        if (keys["ArrowUp"] || keys["w"]) player.y -= player.speed;
+        if (keys["ArrowDown"] || keys["s"]) player.y += player.speed;
+        if (keys["ArrowLeft"] || keys["a"]) player.x -= player.speed;
+        if (keys["ArrowRight"] || keys["d"]) player.x += player.speed;
+
+        // Keep player within bounds
+        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+
+        // Collision detection
+        if (
+            player.x < enemy.x + enemy.width &&
+            player.x + player.width > enemy.x &&
+            player.y < enemy.y + enemy.height &&
+            player.y + player.height > enemy.y
+        ) {
+            alert("נפלת על אויב! המשחק נגמר!");
+            resetGame();
+        }
+
+        if (
+            player.x < child.x + child.width &&
+            player.x + player.width > child.x &&
+            player.y < child.y + child.height &&
+            player.y + player.height > child.y
+        ) {
+            alert("הצלחת להציל את הילדה! ניצחת!");
+            resetGame();
+        }
+    }
+
+    // Draw game objects
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw player
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+
+        // Draw enemy
+        ctx.fillStyle = enemy.color;
+        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+
+        // Draw child
+        ctx.fillStyle = child.color;
+        ctx.fillRect(child.x, child.y, child.width, child.height);
+    }
+
+    // Game loop
+    function gameLoop() {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    // Reset game
+    function resetGame() {
+        player.x = 50;
+        player.y = 50;
+    }
+
+    // Start the game
+    gameLoop();
+</script>
+</body>
+</html>
